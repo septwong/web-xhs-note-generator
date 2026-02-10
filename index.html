@@ -544,7 +544,8 @@
 **4. 如何插入图片？**
 - 方法A：直接截图，在这里按 Ctrl+V 粘贴
 - 方法B：点击上方的“插入图片”按钮
-        </textarea>
+</textarea
+        >
         <div class="mt-2 text-[10px] text-gray-400 text-center">
           输入 @ + --- 可强制分页
         </div>
@@ -822,6 +823,21 @@
           </div>
         </div>
 
+        <div id="image-manager" class="space-y-4 pt-4 border-t border-gray-100">
+          <h3
+            class="text-xs font-black text-gray-400 uppercase tracking-widest"
+          >
+            图片管理
+          </h3>
+          <div
+            id="image-list"
+            class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto custom-scrollbar"
+          ></div>
+          <p class="text-[10px] text-gray-400 text-center">
+            点击图片可复制引用语法
+          </p>
+        </div>
+
         <div class="mt-8 pt-6 border-t border-gray-100 text-center pb-6">
           <p
             class="text-[10px] text-gray-400 font-mono leading-relaxed opacity-70"
@@ -842,8 +858,82 @@
     </aside>
 
     <script>
+      // ==================== 主题封面渲染函数 ====================
+      const themeCoverRenderers = {
+        minimal: (config, title, date, tag, intro) => {
+          if (state.coverImage) {
+            const s = themeStyles.minimal;
+            return `<div class="card-bg p-0 flex flex-col h-full overflow-hidden" style="padding: 0; background-color: ${s.bg};">
+                        <div class="h-[55%] w-full relative overflow-hidden bg-gray-100"><img src="${state.coverImage}" class="w-full h-full object-cover"></div>
+                        <div class="h-[45%] w-full p-8 flex flex-col justify-center text-left">
+                            <div class="flex items-center gap-2 mb-4 text-xs font-bold opacity-70" style="color: ${s.text};"><i data-lucide="user" size="14"></i><span>${tag}</span></div>
+                            <h1 class="leading-[1.1] mb-5 font-bold" style="font-size: ${state.titleSize}px; margin-left:0; margin-right:0; text-align: left; text-shadow: none; border: none; padding: 0; font-family: ${s.fontTitle}; color: ${s.title};">${title}</h1>
+                            <div class="pl-4 border-l-4 leading-relaxed opacity-90 font-medium" style="border-color: ${s.border}; color: ${s.text}; font-family: ${s.fontBody}; white-space: pre-wrap; font-size: ${state.introSize}px;">${intro}</div>
+                        </div>
+                    </div>`;
+          }
+          return `<div class="card-bg flex flex-col justify-between" style="padding: 40px; background: #EBF5FB;">
+                    <div class="flex-1 flex flex-col justify-center items-start">
+                        <div class="text-xs font-bold uppercase tracking-widest mb-4" style="color: #566573;">${date}</div>
+                        <h1 class="font-black leading-tight text-left mb-6" style="font-size: ${state.titleSize}px; letter-spacing: -0.03em; color: #1E3A5F;">${title}</h1>
+                        <div class="w-16 h-1 mb-8" style="background-color: #3498DB;"></div>
+                        <p class="font-medium leading-relaxed" style="font-size: 16px; color: #566573;">${intro}</p>
+                    </div>
+                    <div class="flex justify-between items-center w-full pt-8 mt-auto" style="border-top: 1px solid #AED6F1;">
+                        <div class="flex items-center gap-2 text-xs font-bold" style="color: #1E3A5F;">
+                            <span class="w-6 h-6 rounded-full text-white flex items-center justify-center" style="background-color: #3498DB;">R</span>
+                            ${tag}
+                        </div>
+                        <i data-lucide="arrow-right" style="color: #AED6F1;" size="20"></i>
+                    </div>
+                </div>`;
+        },
+        serif: (config, title, date, tag, intro) => {
+          const s = themeStyles.serif;
+          if (state.coverImage) {
+            return `<div class="card-bg p-0 flex flex-col h-full overflow-hidden" style="padding: 0; background-color: ${s.bg};">
+                        <div class="h-[55%] w-full relative overflow-hidden bg-gray-100"><img src="${state.coverImage}" class="w-full h-full object-cover"></div>
+                        <div class="h-[45%] w-full p-8 flex flex-col justify-center text-left">
+                            <div class="flex items-center gap-2 mb-4 text-xs font-bold opacity-70" style="color: ${s.text};"><i data-lucide="user" size="14"></i><span>${tag}</span></div>
+                            <h1 class="leading-[1.1] mb-5 font-bold" style="font-size: ${state.titleSize}px; margin-left:0; margin-right:0; text-align: left; text-shadow: none; border: none; padding: 0; font-family: ${s.fontTitle}; color: ${s.title};">${title}</h1>
+                            <div class="pl-4 border-l-4 leading-relaxed opacity-90 font-medium" style="border-color: ${s.border}; color: ${s.text}; font-family: ${s.fontBody}; white-space: pre-wrap; font-size: ${state.introSize}px;">${intro}</div>
+                        </div>
+                    </div>`;
+          }
+          return `<div class="card-bg justify-center"><div class="border-l-4 border-[#B85C5C] pl-6"><div class="text-[#B85C5C] font-bold mb-6 tracking-widest text-xs">${date}</div><h1 class="font-bold text-[#2c2c2c] leading-tight" style="font-size: ${state.titleSize}px">${title}</h1><div class="mt-8 text-gray-500 font-medium border-t border-gray-300 pt-4 inline-block text-sm">${tag}</div></div></div>`;
+        },
+        acid: (config, title, date, tag, intro) => {
+          const s = themeStyles.acid;
+          if (state.coverImage) {
+            return `<div class="card-bg p-0 flex flex-col h-full overflow-hidden" style="padding: 0; background-color: ${s.bg};">
+                        <div class="h-[55%] w-full relative overflow-hidden bg-gray-100"><img src="${state.coverImage}" class="w-full h-full object-cover"></div>
+                        <div class="h-[45%] w-full p-8 flex flex-col justify-center text-left">
+                            <div class="flex items-center gap-2 mb-4 text-xs font-bold opacity-70" style="color: ${s.text};"><i data-lucide="user" size="14"></i><span>${tag}</span></div>
+                            <h1 class="leading-[1.1] mb-5 font-bold" style="font-size: ${state.titleSize}px; margin-left:0; margin-right:0; text-align: left; text-shadow: none; border: none; padding: 0; font-family: ${s.fontTitle}; color: ${s.title};">${title}</h1>
+                            <div class="pl-4 border-l-4 leading-relaxed opacity-90 font-medium" style="border-color: ${s.border}; color: ${s.text}; font-family: ${s.fontBody}; white-space: pre-wrap; font-size: ${state.introSize}px;">${intro}</div>
+                        </div>
+                    </div>`;
+          }
+          return `<div class="card-bg"><div class="flex justify-between border-b-2 border-black pb-2 mb-6 font-mono text-xs font-bold"><span>${date}</span><span>ISSUE</span></div><div class="flex-1 flex flex-col justify-center items-center text-center"><h1 class="text-black font-black uppercase leading-[0.9] transform skew-x-2 drop-shadow-xl" style="font-size: ${state.titleSize}px;">${title}</h1><div class="mt-6 bg-black text-[#CCFF00] px-4 py-2 font-bold text-lg transform skew-x-12">${tag}</div></div></div>`;
+        },
+        tech: (config, title, date, tag, intro) => {
+          const s = themeStyles.tech;
+          if (state.coverImage) {
+            return `<div class="card-bg p-0 flex flex-col h-full overflow-hidden" style="padding: 0; background-color: ${s.bg};">
+                        <div class="h-[55%] w-full relative overflow-hidden bg-gray-100"><img src="${state.coverImage}" class="w-full h-full object-cover"></div>
+                        <div class="h-[45%] w-full p-8 flex flex-col justify-center text-left">
+                            <div class="flex items-center gap-2 mb-4 text-xs font-bold opacity-70" style="color: ${s.text};"><i data-lucide="user" size="14"></i><span>${tag}</span></div>
+                            <h1 class="leading-[1.1] mb-5 font-bold" style="font-size: ${state.titleSize}px; margin-left:0; margin-right:0; text-align: left; text-shadow: none; border: none; padding: 0; font-family: ${s.fontTitle}; background: linear-gradient(to right, #60A5FA, #A78BFA); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;">${title}</h1>
+                            <div class="pl-4 border-l-4 leading-relaxed opacity-90 font-medium" style="border-color: ${s.border}; color: ${s.text}; font-family: ${s.fontBody}; white-space: pre-wrap; font-size: ${state.introSize}px;">${intro}</div>
+                        </div>
+                    </div>`;
+          }
+          return `<div class="card-bg justify-center relative"><div class="grid-bg"></div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-blue-500/20 blur-[100px] rounded-full pointer-events-none"></div><div class="z-10 text-center"><div class="text-blue-400 font-mono text-xs mb-6 tracking-[0.3em] uppercase border border-blue-500/30 inline-block px-3 py-1 rounded bg-blue-900/20 backdrop-blur">System Ready</div><h1 class="font-bold leading-tight mb-6" style="font-size: ${state.titleSize}px; background: linear-gradient(to right, #60A5FA, #A78BFA); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;">${title}</h1><div class="flex items-center justify-center gap-2 text-gray-400 text-xs font-mono"><span>${date}</span><span class="text-blue-500">//</span><span>${tag}</span></div></div></div>`;
+        },
+      };
+
+      // ==================== 主题配置 ====================
       const STYLES = [
-        // 更新了浅蓝色的配置
         {
           id: "minimal",
           name: "🔵 浅蓝风",
@@ -873,6 +963,42 @@
           text: "#FFF",
         },
       ];
+
+      // 封面主题样式（全局定义，避免重复创建）
+      const themeStyles = {
+        minimal: {
+          bg: "#EBF5FB",
+          text: "#566573",
+          title: "#1E3A5F",
+          border: "#3498DB",
+          fontTitle: "'Inter', sans-serif",
+          fontBody: "'Inter', sans-serif",
+        },
+        serif: {
+          bg: "#F2EFE9",
+          text: "#2c2c2c",
+          title: "#2c2c2c",
+          border: "#B85C5C",
+          fontTitle: "'Noto Serif SC', serif",
+          fontBody: "'FangSong', serif",
+        },
+        acid: {
+          bg: "#CCFF00",
+          text: "#000",
+          title: "#000",
+          border: "#000",
+          fontTitle: "sans-serif",
+          fontBody: "'Noto Sans SC', sans-serif",
+        },
+        tech: {
+          bg: "#0F172A",
+          text: "#94A3B8",
+          title: "#FFF",
+          border: "#3B82F6",
+          fontTitle: "'Inter', sans-serif",
+          fontBody: "'Inter', sans-serif",
+        },
+      };
 
       let state = {
         styleId: "minimal",
@@ -907,13 +1033,82 @@
 
       marked.setOptions({ breaks: true, gfm: true, renderer: renderer });
 
+      // ==================== 状态持久化 ====================
+      function saveState() {
+        const config = {
+          panelWidth: {
+            left: panelState.left.width,
+            right: panelState.right.width,
+          },
+          styleId: state.styleId,
+          titleSize: document.getElementById("title-size").value,
+          bodySize: document.getElementById("body-size").value,
+          headingScale: document.getElementById("heading-scale").value,
+          canvasSize: document.getElementById("canvas-size").value,
+          title: document.getElementById("input-title").value,
+          intro: document.getElementById("input-intro").value,
+          date: document.getElementById("input-date").value,
+          tag: document.getElementById("input-tag").value,
+        };
+        localStorage.setItem("xhs-note-generator", JSON.stringify(config));
+      }
+
+      function loadState() {
+        const saved = localStorage.getItem("xhs-note-generator");
+        if (!saved) return;
+        try {
+          const config = JSON.parse(saved);
+          if (config.panelWidth) {
+            panelState.left.width = config.panelWidth.left || 350;
+            panelState.right.width = config.panelWidth.right || 320;
+            document.getElementById("left-panel").style.width =
+              panelState.left.width + "px";
+            document.getElementById("right-panel").style.width =
+              panelState.right.width + "px";
+          }
+          if (config.styleId) {
+            state.styleId = config.styleId;
+            renderStyleGrid();
+          }
+          if (config.titleSize) {
+            document.getElementById("title-size").value = config.titleSize;
+          }
+          if (config.bodySize) {
+            document.getElementById("body-size").value = config.bodySize;
+          }
+          if (config.headingScale) {
+            document.getElementById("heading-scale").value =
+              config.headingScale;
+          }
+          if (config.canvasSize) {
+            document.getElementById("canvas-size").value = config.canvasSize;
+          }
+          if (config.title) {
+            document.getElementById("input-title").value = config.title;
+          }
+          if (config.intro) {
+            document.getElementById("input-intro").value = config.intro;
+          }
+          if (config.date) {
+            document.getElementById("input-date").value = config.date;
+          }
+          if (config.tag) {
+            document.getElementById("input-tag").value = config.tag;
+          }
+        } catch (e) {
+          console.warn("恢复配置失败", e);
+        }
+      }
+
       window.onload = () => {
+        loadState();
         renderStyleGrid();
         initUrlParams();
         updatePreview();
         lucide.createIcons();
-        initResizers(); // 启动拖拽
-        enablePasteImage(); // 启动粘贴
+        initResizers();
+        enablePasteImage();
+        updateImageList();
       };
 
       let isToolbarOpen = false;
@@ -999,6 +1194,7 @@
             resizer.classList.remove("active");
             document.body.style.cursor = "default";
             document.body.classList.remove("select-none");
+            saveState();
           }
         };
         resizer.addEventListener("mousedown", startResize);
@@ -1076,6 +1272,7 @@
             state.styleId = style.id;
             renderStyleGrid();
             updatePreview();
+            saveState();
           };
           grid.appendChild(btn);
         });
@@ -1102,6 +1299,7 @@
           const textarea = document.getElementById("input-content");
           textarea.value = textarea.value + `\n![插图](img:${id})\n`;
           updatePreview();
+          updateImageList();
           input.value = "";
         };
         reader.readAsDataURL(file);
@@ -1111,6 +1309,44 @@
         state.coverImage = null;
         document.getElementById("cover-image-upload").value = "";
         updatePreview();
+      }
+
+      // ==================== 图片管理 ====================
+      function updateImageList() {
+        const list = document.getElementById("image-list");
+        const images = Object.entries(state.bodyImages);
+        if (images.length === 0) {
+          list.innerHTML =
+            '<p class="col-span-3 text-xs text-gray-400 text-center py-4">暂无图片</p>';
+          return;
+        }
+        list.innerHTML = images
+          .map(
+            ([id, src]) => `
+          <div class="group relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 cursor-pointer" onclick="copyImageRef('${id}')">
+            <img src="${src}" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <button class="text-white hover:text-red-400 p-1" onclick="event.stopPropagation(); deleteBodyImage('${id}')" title="删除">
+                <i data-lucide="trash-2" size="14"></i>
+              </button>
+            </div>
+          </div>
+        `,
+          )
+          .join("");
+        lucide.createIcons();
+      }
+
+      function deleteBodyImage(id) {
+        delete state.bodyImages[id];
+        updatePreview();
+        updateImageList();
+      }
+
+      function copyImageRef(id) {
+        navigator.clipboard.writeText(`![截图](img:${id})`).then(() => {
+          // 可选：显示复制成功的提示
+        });
       }
 
       // ==================== 核心：渲染与包裹逻辑 ====================
@@ -1195,6 +1431,8 @@
           );
         });
         lucide.createIcons();
+        updateImageList();
+        saveState();
       }
 
       // ==================== 极速 JPG 导出逻辑 ====================
@@ -1241,13 +1479,15 @@
                 quality: 0.9,
                 pixelRatio: 2,
                 backgroundColor: "#ffffff",
-              })
-            )
+              }),
+            ),
           );
 
           dataUrls.forEach((dataUrl, index) => {
             const imgData = dataUrl.split(",")[1];
-            zip.file(`rednote_page_${index + 1}.jpg`, imgData, { base64: true });
+            zip.file(`rednote_page_${index + 1}.jpg`, imgData, {
+              base64: true,
+            });
           });
 
           const content = await zip.generateAsync({ type: "blob" });
@@ -1262,81 +1502,8 @@
       }
 
       function renderCoverHTML(config, title, date, tag, intro) {
-        if (state.coverImage) {
-          let themeStyles = {
-            // 更新了浅蓝色的封面配置
-            minimal: {
-              bg: "#EBF5FB",
-              text: "#566573",
-              title: "#1E3A5F",
-              border: "#3498DB",
-              fontTitle: "'Inter', sans-serif",
-              fontBody: "'Inter', sans-serif",
-            },
-            serif: {
-              bg: "#F2EFE9",
-              text: "#2c2c2c",
-              title: "#2c2c2c",
-              border: "#B85C5C",
-              fontTitle: "'Noto Serif SC', serif",
-              fontBody: "'FangSong', serif",
-            },
-            acid: {
-              bg: "#CCFF00",
-              text: "#000",
-              title: "#000",
-              border: "#000",
-              fontTitle: "sans-serif",
-              fontBody: "'Noto Sans SC', sans-serif",
-            },
-            tech: {
-              bg: "#0F172A",
-              text: "#94A3B8",
-              title: "#FFF",
-              border: "#3B82F6",
-              fontTitle: "'Inter', sans-serif",
-              fontBody: "'Inter', sans-serif",
-            },
-          };
-          let s = themeStyles[config.id];
-          let titleStyle = `color: ${s.title};`;
-          if (config.id === "tech")
-            titleStyle = `background: linear-gradient(to right, #60A5FA, #A78BFA); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;`;
-
-          return `
-                <div class="card-bg p-0 flex flex-col h-full overflow-hidden" style="padding: 0; background-color: ${s.bg};">
-                    <div class="h-[55%] w-full relative overflow-hidden bg-gray-100"><img src="${state.coverImage}" class="w-full h-full object-cover"></div>
-                    <div class="h-[45%] w-full p-8 flex flex-col justify-center text-left">
-                        <div class="flex items-center gap-2 mb-4 text-xs font-bold opacity-70" style="color: ${s.text};"><i data-lucide="user" size="14"></i><span>${tag}</span></div>
-                        <h1 class="leading-[1.1] mb-5 font-bold" style="font-size: ${state.titleSize}px; margin-left:0; margin-right:0; text-align: left; text-shadow: none; border: none; padding: 0; font-family: ${s.fontTitle}; ${titleStyle}">${title}</h1>
-                        <div class="pl-4 border-l-4 leading-relaxed opacity-90 font-medium" style="border-color: ${s.border}; color: ${s.text}; font-family: ${s.fontBody}; white-space: pre-wrap; font-size: ${state.introSize}px;">${intro}</div>
-                    </div>
-                </div>`;
-        }
-        if (config.id === "minimal") {
-          // 更新了浅蓝色纯文字封面的配色
-          return `<div class="card-bg flex flex-col justify-between" style="padding: 40px; background: #EBF5FB;">
-                    <div class="flex-1 flex flex-col justify-center items-start">
-                        <div class="text-xs font-bold uppercase tracking-widest mb-4" style="color: #566573;">${date}</div>
-                        <h1 class="font-black leading-tight text-left mb-6" style="font-size: ${state.titleSize}px; letter-spacing: -0.03em; color: #1E3A5F;">${title}</h1>
-                        <div class="w-16 h-1 mb-8" style="background-color: #3498DB;"></div>
-                        <p class="font-medium leading-relaxed" style="font-size: 16px; color: #566573;">${intro}</p>
-                    </div>
-                    <div class="flex justify-between items-center w-full pt-8 mt-auto" style="border-top: 1px solid #AED6F1;">
-                        <div class="flex items-center gap-2 text-xs font-bold" style="color: #1E3A5F;">
-                            <span class="w-6 h-6 rounded-full text-white flex items-center justify-center" style="background-color: #3498DB;">R</span>
-                            ${tag}
-                        </div>
-                        <i data-lucide="arrow-right" style="color: #AED6F1;" size="20"></i>
-                    </div>
-                </div>`;
-        }
-        if (config.id === "serif")
-          return `<div class="card-bg justify-center"><div class="border-l-4 border-[#B85C5C] pl-6"><div class="text-[#B85C5C] font-bold mb-6 tracking-widest text-xs">${date}</div><h1 class="font-bold text-[#2c2c2c] leading-tight" style="font-size: ${state.titleSize}px">${title}</h1><div class="mt-8 text-gray-500 font-medium border-t border-gray-300 pt-4 inline-block text-sm">${tag}</div></div></div>`;
-        if (config.id === "acid")
-          return `<div class="card-bg"><div class="flex justify-between border-b-2 border-black pb-2 mb-6 font-mono text-xs font-bold"><span>${date}</span><span>ISSUE</span></div><div class="flex-1 flex flex-col justify-center items-center text-center"><h1 class="text-black font-black uppercase leading-[0.9] transform skew-x-2 drop-shadow-xl" style="font-size: ${state.titleSize}px;">${title}</h1><div class="mt-6 bg-black text-[#CCFF00] px-4 py-2 font-bold text-lg transform skew-x-12">${tag}</div></div></div>`;
-        if (config.id === "tech")
-          return `<div class="card-bg justify-center relative"><div class="grid-bg"></div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-blue-500/20 blur-[100px] rounded-full pointer-events-none"></div><div class="z-10 text-center"><div class="text-blue-400 font-mono text-xs mb-6 tracking-[0.3em] uppercase border border-blue-500/30 inline-block px-3 py-1 rounded bg-blue-900/20 backdrop-blur">System Ready</div><h1 class="font-bold leading-tight mb-6" style="font-size: ${state.titleSize}px; background: linear-gradient(to right, #60A5FA, #A78BFA); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;">${title}</h1><div class="flex items-center justify-center gap-2 text-gray-400 text-xs font-mono"><span>${date}</span><span class="text-blue-500">//</span><span>${tag}</span></div></div></div>`;
+        const renderer = themeCoverRenderers[config.id];
+        if (renderer) return renderer(config, title, date, tag, intro);
         return `<div class="card-bg justify-center text-center"><h1 class="font-bold text-gray-900 mt-4" style="font-size: ${state.titleSize}px">${title}</h1></div>`;
       }
 
