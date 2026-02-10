@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>RedNote Lite - 阿泽定制版 v8.3</title>
+    <title>小红书图文生成器</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
@@ -15,10 +15,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@300;400;600;700&family=Inter:wght@400;600;800&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="stylesheet" href="fonts/fonts.css" />
 
     <style id="dynamic-heading-style"></style>
 
@@ -54,7 +51,6 @@
       select:focus {
         outline: none;
         border-color: #000;
-        ring: 1px;
       }
 
       /* 拖拽条 */
@@ -462,7 +458,9 @@
         font-weight: 800;
         background: linear-gradient(to right, #60a5fa, #a78bfa);
         -webkit-background-clip: text;
+        background-clip: text;
         color: transparent;
+        -webkit-text-fill-color: transparent;
         border-bottom: 4px solid #7ea4f8;
       }
 
@@ -523,28 +521,28 @@
           oninput="updatePreview()"
           spellcheck="false"
         >
-          # 这是一个一级标题
+# 这是一个一级标题
 
-          ## 这是一个二级标题
+## 这是一个二级标题
 
-          这里是正文段落。如果需要强调，可以使用**加粗文字**。
+这里是正文段落。如果需要强调，可以使用**加粗文字**。
 
-          ### 常用功能演示：
+### 常用功能演示：
 
-          **1. 列表**
-          - 观点一：阅读很重要
-          - 观点二：亲子陪伴
+**1. 列表**
+- 观点一：阅读很重要
+- 观点二：亲子陪伴
 
-          **2. 引用块**
-          > “阅读是孩子看世界的窗口。”
+**2. 引用块**
+> “阅读是孩子看世界的窗口。”
 
-          **3. 如何分页？**
-          在需要切分的地方输入 `@` 加上三个减号：
-          @---
+**3. 如何分页？**
+在需要切分的地方输入 `@` 加上三个减号：
+@---
 
-          **4. 如何插入图片？**
-          - 方法A：直接截图，在这里按 Ctrl+V 粘贴
-          - 方法B：点击上方的“插入图片”按钮
+**4. 如何插入图片？**
+- 方法A：直接截图，在这里按 Ctrl+V 粘贴
+- 方法B：点击上方的“插入图片”按钮
         </textarea>
         <div class="mt-2 text-[10px] text-gray-400 text-center">
           输入 @ + --- 可强制分页
@@ -705,7 +703,7 @@
               type="text"
               id="input-title"
               class="w-full bg-gray-50 border border-gray-200 rounded px-2 py-1.5 text-xs font-bold focus:bg-white focus:ring-1 focus:ring-black outline-none"
-              value="高效育儿心得"
+              value="小红书标题"
               oninput="updatePreview()"
             />
           </div>
@@ -728,7 +726,7 @@
                 type="text"
                 id="input-date"
                 class="w-full bg-gray-50 border border-gray-200 rounded px-2 py-1.5 text-xs"
-                value="VOL.08"
+                value="2026/02/10"
                 oninput="updatePreview()"
               />
             </div>
@@ -739,7 +737,7 @@
                 type="text"
                 id="input-tag"
                 class="w-full bg-gray-50 border border-gray-200 rounded px-2 py-1.5 text-xs"
-                value="@阿泽的育儿书架"
+                value="@小红书"
                 oninput="updatePreview()"
               />
             </div>
@@ -827,10 +825,7 @@
           <p
             class="text-[10px] text-gray-400 font-mono leading-relaxed opacity-70"
           >
-            小红书笔记生成器<br />
-            Customized for
-            <span class="font-bold text-gray-500">@阿泽的育儿书架</span><br />
-            Powered by Google Gemini
+            小红书图文生成器<br />
           </p>
         </div>
       </div>
@@ -846,12 +841,6 @@
     </aside>
 
     <script>
-      // 隐藏彩蛋
-      console.log(
-        "%c RedNote Lite | Customized for @阿泽的育儿书架 | Powered by Google Gemini",
-        "background: #000; color: #fff; padding: 4px; border-radius: 4px;",
-      );
-
       const STYLES = [
         // 更新了浅蓝色的配置
         {
@@ -1050,8 +1039,7 @@
         document
           .getElementById("input-content")
           .addEventListener("paste", function (e) {
-            const items = (e.clipboardData || e.originalEvent.clipboardData)
-              .items;
+            const items = e.clipboardData?.items;
             for (let i = 0; i < items.length; i++) {
               if (
                 items[i].kind === "file" &&
@@ -1218,8 +1206,8 @@
 
         try {
           const dataUrl = await htmlToImage.toJpeg(element, {
-            quality: 0.85,
-            pixelRatio: 4,
+            quality: 0.9,
+            pixelRatio: 2,
             backgroundColor: "#ffffff",
           });
           saveAs(dataUrl, filename);
@@ -1243,17 +1231,23 @@
 
         try {
           const zip = new JSZip();
-          const cards = document.querySelectorAll(".card-wrapper");
+          const cards = Array.from(document.querySelectorAll(".card-wrapper"));
 
-          for (let i = 0; i < cards.length; i++) {
-            const dataUrl = await htmlToImage.toJpeg(cards[i], {
-              quality: 0.85,
-              pixelRatio: 4,
-              backgroundColor: "#ffffff",
-            });
+          // 并行导出所有卡片
+          const dataUrls = await Promise.all(
+            cards.map((card) =>
+              htmlToImage.toJpeg(card, {
+                quality: 0.9,
+                pixelRatio: 2,
+                backgroundColor: "#ffffff",
+              })
+            )
+          );
+
+          dataUrls.forEach((dataUrl, index) => {
             const imgData = dataUrl.split(",")[1];
-            zip.file(`rednote_page_${i + 1}.jpg`, imgData, { base64: true });
-          }
+            zip.file(`rednote_page_${index + 1}.jpg`, imgData, { base64: true });
+          });
 
           const content = await zip.generateAsync({ type: "blob" });
           saveAs(content, "RedNote_Images_JPG.zip");
@@ -1306,7 +1300,7 @@
           let s = themeStyles[config.id];
           let titleStyle = `color: ${s.title};`;
           if (config.id === "tech")
-            titleStyle = `background: linear-gradient(to right, #60A5FA, #A78BFA); -webkit-background-clip: text; color: transparent;`;
+            titleStyle = `background: linear-gradient(to right, #60A5FA, #A78BFA); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;`;
 
           return `
                 <div class="card-bg p-0 flex flex-col h-full overflow-hidden" style="padding: 0; background-color: ${s.bg};">
@@ -1341,7 +1335,7 @@
         if (config.id === "acid")
           return `<div class="card-bg"><div class="flex justify-between border-b-2 border-black pb-2 mb-6 font-mono text-xs font-bold"><span>${date}</span><span>ISSUE</span></div><div class="flex-1 flex flex-col justify-center items-center text-center"><h1 class="text-black font-black uppercase leading-[0.9] transform skew-x-2 drop-shadow-xl" style="font-size: ${state.titleSize}px;">${title}</h1><div class="mt-6 bg-black text-[#CCFF00] px-4 py-2 font-bold text-lg transform skew-x-12">${tag}</div></div></div>`;
         if (config.id === "tech")
-          return `<div class="card-bg justify-center relative"><div class="grid-bg"></div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-blue-500/20 blur-[100px] rounded-full pointer-events-none"></div><div class="z-10 text-center"><div class="text-blue-400 font-mono text-xs mb-6 tracking-[0.3em] uppercase border border-blue-500/30 inline-block px-3 py-1 rounded bg-blue-900/20 backdrop-blur">System Ready</div><h1 class="font-bold leading-tight mb-6" style="font-size: ${state.titleSize}px; background: linear-gradient(to right, #60A5FA, #A78BFA); -webkit-background-clip: text; color: transparent;">${title}</h1><div class="flex items-center justify-center gap-2 text-gray-400 text-xs font-mono"><span>${date}</span><span class="text-blue-500">//</span><span>${tag}</span></div></div></div>`;
+          return `<div class="card-bg justify-center relative"><div class="grid-bg"></div><div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-blue-500/20 blur-[100px] rounded-full pointer-events-none"></div><div class="z-10 text-center"><div class="text-blue-400 font-mono text-xs mb-6 tracking-[0.3em] uppercase border border-blue-500/30 inline-block px-3 py-1 rounded bg-blue-900/20 backdrop-blur">System Ready</div><h1 class="font-bold leading-tight mb-6" style="font-size: ${state.titleSize}px; background: linear-gradient(to right, #60A5FA, #A78BFA); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;">${title}</h1><div class="flex items-center justify-center gap-2 text-gray-400 text-xs font-mono"><span>${date}</span><span class="text-blue-500">//</span><span>${tag}</span></div></div></div>`;
         return `<div class="card-bg justify-center text-center"><h1 class="font-bold text-gray-900 mt-4" style="font-size: ${state.titleSize}px">${title}</h1></div>`;
       }
 
