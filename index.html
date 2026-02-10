@@ -1101,6 +1101,13 @@
       }
 
       window.onload = () => {
+        // 设置默认日期为当前日期
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        document.getElementById("input-date").value = `${year}/${month}/${day}`;
+
         loadState();
         renderStyleGrid();
         initUrlParams();
