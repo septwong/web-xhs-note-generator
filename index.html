@@ -531,15 +531,16 @@
 ### 常用功能演示：
 
 **1. 列表**
-- 观点一：阅读很重要
-- 观点二：亲子陪伴
+- 观点一：这是第一个观点
+- 观点二：这是第二个观点
 
 **2. 引用块**
-> “阅读是孩子看世界的窗口。”
+> “这是引用块”
+
+@---
 
 **3. 如何分页？**
-在需要切分的地方输入 `@` 加上三个减号：
-@---
+在需要切分的地方输入 `@` 加上三个减号
 
 **4. 如何插入图片？**
 - 方法A：直接截图，在这里按 Ctrl+V 粘贴
@@ -1425,10 +1426,13 @@
 
         pages.forEach((pageText, index) => {
           if (!pageText.trim()) return;
-          let processedText = pageText.replace(
-            /::: row\n([\s\S]*?)\n:::/g,
-            '<div class="img-row">$1</div>',
-          );
+          let processedText = pageText
+            .replace(
+              /::: row\n([\s\S]*?)\n:::/g,
+              '<div class="img-row">$1</div>',
+            )
+            // 把 @--- 替换为 HTML 实体，避免被 marked 渲染为水平线
+            .replace(/@---/g, "&#64;---");
           const htmlContent = marked.parse(processedText);
           container.appendChild(
             createCardWithDownload(
