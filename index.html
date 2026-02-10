@@ -24,109 +24,462 @@
 
     <style>
       /* ==================== 基础交互样式 ==================== */
-      body { font-family: 'Inter', 'Noto Sans SC', sans-serif; background-color: #F3F4F6; overflow: hidden; touch-action: none; }
-      .no-scrollbar::-webkit-scrollbar { display: none; }
-      .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-      .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 3px; }
-      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-      input:focus, textarea:focus, select:focus { outline: none; border-color: #000; ring: 1px; }
+      body {
+        font-family: "Inter", "Noto Sans SC", sans-serif;
+        background-color: #f3f4f6;
+        overflow: hidden;
+        touch-action: none;
+      }
+
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e5e7eb;
+        border-radius: 3px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: #000;
+        ring: 1px;
+      }
 
       /* 拖拽条 */
       .resizer {
-          width: 4px; background-color: #e5e7eb; cursor: col-resize; transition: background-color 0.2s; position: relative; z-index: 40; flex-shrink: 0; touch-action: none;
+        width: 4px;
+        background-color: #e5e7eb;
+        cursor: col-resize;
+        transition: background-color 0.2s;
+        position: relative;
+        z-index: 40;
+        flex-shrink: 0;
+        touch-action: none;
       }
-      .resizer::after { content: ''; position: absolute; top: 0; bottom: 0; left: -15px; right: -15px; z-index: 40; }
-      .resizer:hover, .resizer.active { background-color: #3b82f6; }
+
+      .resizer::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -15px;
+        right: -15px;
+        z-index: 40;
+      }
+
+      .resizer:hover,
+      .resizer.active {
+        background-color: #3b82f6;
+      }
 
       /* 折叠按钮 */
       .toggle-btn {
-          position: absolute; top: 50%; transform: translateY(-50%); width: 24px; height: 60px;
-          background: white; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;
-          cursor: pointer; z-index: 50; color: #4b5563; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-          transition: all 0.2s; border-radius: 4px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 24px;
+        height: 60px;
+        background: white;
+        border: 1px solid #d1d5db;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 50;
+        color: #4b5563;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s;
+        border-radius: 4px;
       }
-      .toggle-btn:hover { background: #f3f4f6; color: #000; transform: translateY(-50%) scale(1.1); }
-      #left-toggle { right: -28px; border-radius: 0 8px 8px 0; border-left: none; }
-      #right-toggle { left: -28px; border-radius: 8px 0 0 8px; border-right: none; }
 
-      .panel-transition { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+      .toggle-btn:hover {
+        background: #f3f4f6;
+        color: #000;
+        transform: translateY(-50%) scale(1.1);
+      }
+
+      #left-toggle {
+        right: -28px;
+        border-radius: 0 8px 8px 0;
+        border-left: none;
+      }
+
+      #right-toggle {
+        left: -28px;
+        border-radius: 8px 0 0 8px;
+        border-right: none;
+      }
+
+      .panel-transition {
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
 
       /* 卡片基础 */
       .card-wrapper {
-          width: 375px; height: 500px;
-          background: white; position: relative; overflow: hidden; flex-shrink: 0;
-          box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15);
-          transition: width 0.3s ease, height 0.3s ease, transform 0.2s;
+        width: 375px;
+        height: 500px;
+        background: white;
+        position: relative;
+        overflow: hidden;
+        flex-shrink: 0;
+        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15);
+        transition:
+          width 0.3s ease,
+          height 0.3s ease,
+          transform 0.2s;
       }
 
       /* Markdown 样式 (无表格) */
-      .markdown-body { line-height: 1.7; color: inherit; }
-      .markdown-body p { margin-bottom: 0.8em; }
-      .markdown-body > *:first-child { margin-top: 0 !important; }
-      .markdown-body blockquote p:last-child { margin-bottom: 0; }
-      .markdown-body ul { padding-left: 1.2em; margin-bottom: 0.8em; list-style-type: disc; }
+      .markdown-body {
+        line-height: 1.7;
+        color: inherit;
+      }
+
+      .markdown-body p {
+        margin-bottom: 0.8em;
+      }
+
+      .markdown-body > *:first-child {
+        margin-top: 0 !important;
+      }
+
+      .markdown-body blockquote p:last-child {
+        margin-bottom: 0;
+      }
+
+      .markdown-body ul {
+        padding-left: 1.2em;
+        margin-bottom: 0.8em;
+        list-style-type: disc;
+      }
+
       .markdown-body pre {
-          padding: 12px; border-radius: 6px; overflow-x: hidden;
-          white-space: pre-wrap; word-wrap: break-word;
-          font-family: 'Menlo', monospace; font-size: 0.85em; margin-bottom: 1em;
+        padding: 12px;
+        border-radius: 6px;
+        overflow-x: hidden;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: "Menlo", monospace;
+        font-size: 0.85em;
+        margin-bottom: 1em;
       }
+
       .markdown-body img {
-          max-width: 100%; height: auto; border-radius: 4px; margin: 12px auto; display: block;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        margin: 12px auto;
+        display: block;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
       }
-      .img-row { display: flex; gap: 8px; margin: 12px 0; justify-content: center; align-items: stretch; }
-      .img-row img { margin: 0 !important; flex: 1; width: 0; min-width: 0; object-fit: cover; height: 100%; }
+
+      .img-row {
+        display: flex;
+        gap: 8px;
+        margin: 12px 0;
+        justify-content: center;
+        align-items: stretch;
+      }
+
+      .img-row img {
+        margin: 0 !important;
+        flex: 1;
+        width: 0;
+        min-width: 0;
+        object-fit: cover;
+        height: 100%;
+      }
 
       /* ==================== 风格主题 CSS ==================== */
 
       /* 1. 🔵 浅蓝风 (Light Blue) - 全新配色 */
       .theme-minimal {
-          --bg: #EBF5FB;         /* 浅蓝背景 */
-          --text: #1E3A5F;       /* 深蓝文本 */
-          --gray: #566573;       /* 灰蓝辅助色 */
-          --border: #AED6F1;     /* 浅蓝边框 */
-          --accent: #3498DB;     /* 亮蓝提亮色 */
+        --bg: #ebf5fb;
+        /* 浅蓝背景 */
+        --text: #1e3a5f;
+        /* 深蓝文本 */
+        --gray: #566573;
+        /* 灰蓝辅助色 */
+        --border: #aed6f1;
+        /* 浅蓝边框 */
+        --accent: #3498db;
+        /* 亮蓝提亮色 */
       }
-      .theme-minimal .card-bg { background-color: var(--bg); height: 100%; padding: 32px; font-family: 'Inter', 'Noto Sans SC', sans-serif; display: flex; flex-direction: column; color: var(--text); }
+
+      .theme-minimal .card-bg {
+        background-color: var(--bg);
+        height: 100%;
+        padding: 32px;
+        font-family: "Inter", "Noto Sans SC", sans-serif;
+        display: flex;
+        flex-direction: column;
+        color: var(--text);
+      }
+
       /* 标题颜色改为深蓝，左侧线条改为亮蓝 */
-      .theme-minimal .markdown-body h1 { font-size: 1.5em; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.8em; color: var(--text); border-left: 3px solid var(--accent); padding-left: 12px; }
-      .theme-minimal .markdown-body h2 { font-size: 1.2em; font-weight: 700; margin-top: 1.2em; margin-bottom: 0.5em; color: var(--text); }
-      .theme-minimal .markdown-body h3 { font-size: 1.1em; font-weight: 600; margin-top: 1em; color: var(--text); opacity: 0.9; }
+      .theme-minimal .markdown-body h1 {
+        font-size: 1.5em;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.8em;
+        color: var(--text);
+        border-left: 3px solid var(--accent);
+        padding-left: 12px;
+      }
+
+      .theme-minimal .markdown-body h2 {
+        font-size: 1.2em;
+        font-weight: 700;
+        margin-top: 1.2em;
+        margin-bottom: 0.5em;
+        color: var(--text);
+      }
+
+      .theme-minimal .markdown-body h3 {
+        font-size: 1.1em;
+        font-weight: 600;
+        margin-top: 1em;
+        color: var(--text);
+        opacity: 0.9;
+      }
+
       /* 引用块配色调整 */
-      .theme-minimal .markdown-body blockquote { border-left: 2px solid var(--accent); padding-left: 16px; color: var(--gray); font-style: italic; margin: 16px 0; background-color: rgba(52, 152, 219, 0.05); padding: 12px 16px; border-radius: 0 8px 8px 0;}
+      .theme-minimal .markdown-body blockquote {
+        border-left: 2px solid var(--accent);
+        padding-left: 16px;
+        color: var(--gray);
+        font-style: italic;
+        margin: 16px 0;
+        background-color: rgba(52, 152, 219, 0.05);
+        padding: 12px 16px;
+        border-radius: 0 8px 8px 0;
+      }
+
       /* 代码块背景调整 */
-      .theme-minimal .markdown-body pre { background: #D6EAF8; color: var(--text); border: 1px solid var(--border); border-radius: 8px; }
+      .theme-minimal .markdown-body pre {
+        background: #d6eaf8;
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
 
       /* 2. 📖 书卷风 */
-      .theme-serif { --bg: #F2EFE9; --text: #2c2c2c; --accent: #B85C5C; }
-      .theme-serif .card-bg { background-color: var(--bg); height: 100%; padding: 32px; font-family: 'Noto Serif SC', serif; display: flex; flex-direction: column; background-image: linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px); background-size: 100% 100%; }
-      .theme-serif .markdown-body h1 { font-size: 2em; font-weight: 900; color: var(--text); margin-bottom: 30px; letter-spacing: 2px; border-left: 4px solid var(--accent); padding-left: 16px; }
-      .theme-serif .markdown-body h2 { font-size: 1.2em; font-weight: 700; color: var(--accent); margin-top: 20px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 4px; }
-      .theme-serif .markdown-body h3 { font-size: 1.15em; font-weight: 700; color: #333; margin-top: 16px; margin-bottom: 8px; }
-      .theme-serif .markdown-body h4 { font-size: 1.05em; font-weight: 700; color: #666; margin-top: 12px; margin-bottom: 4px; }
-      .theme-serif .markdown-body blockquote { font-family: "FangSong", serif; color: #555; background: rgba(255,255,255,0.5); padding: 10px; font-size: 1.05em; margin: 15px 0; }
-      .theme-serif .markdown-body pre { background: #fff; border: 1px solid #ddd; color: #444; }
+      .theme-serif {
+        --bg: #f2efe9;
+        --text: #2c2c2c;
+        --accent: #b85c5c;
+      }
+
+      .theme-serif .card-bg {
+        background-color: var(--bg);
+        height: 100%;
+        padding: 32px;
+        font-family: "Noto Serif SC", serif;
+        display: flex;
+        flex-direction: column;
+        background-image: linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0.02) 1px,
+          transparent 1px
+        );
+        background-size: 100% 100%;
+      }
+
+      .theme-serif .markdown-body h1 {
+        font-size: 2em;
+        font-weight: 900;
+        color: var(--text);
+        margin-bottom: 30px;
+        letter-spacing: 2px;
+        border-left: 4px solid var(--accent);
+        padding-left: 16px;
+      }
+
+      .theme-serif .markdown-body h2 {
+        font-size: 1.2em;
+        font-weight: 700;
+        color: var(--accent);
+        margin-top: 20px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding-bottom: 4px;
+      }
+
+      .theme-serif .markdown-body h3 {
+        font-size: 1.15em;
+        font-weight: 700;
+        color: #333;
+        margin-top: 16px;
+        margin-bottom: 8px;
+      }
+
+      .theme-serif .markdown-body h4 {
+        font-size: 1.05em;
+        font-weight: 700;
+        color: #666;
+        margin-top: 12px;
+        margin-bottom: 4px;
+      }
+
+      .theme-serif .markdown-body blockquote {
+        font-family: "FangSong", serif;
+        color: #555;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 10px;
+        font-size: 1.05em;
+        margin: 15px 0;
+      }
+
+      .theme-serif .markdown-body pre {
+        background: #fff;
+        border: 1px solid #ddd;
+        color: #444;
+      }
 
       /* 3. ⚡ 冲击波 (Acid) */
-      .theme-acid { --bg: #CCFF00; --text: #000; --accent: #000; }
-      .theme-acid .card-bg { background-color: var(--bg); height: 100%; padding: 24px; display: flex; flex-direction: column; font-family: 'Noto Sans SC', sans-serif;}
-      .theme-acid .markdown-body h1 { font-size: 1.6em; font-weight: 900; border-bottom: 5px solid #000; text-transform: uppercase; margin: 0.6em 0; line-height: 1.1; font-family: sans-serif; }
-      .theme-acid .markdown-body h2 { font-size: 1.3em; font-weight: 800; background: #000; color: var(--bg); display: block; width: fit-content; padding: 4px 10px; transform: skew(-5deg); margin: 1em 0 0.5em; }
-      .theme-acid .markdown-body h3 { font-size: 1.15em; font-weight: 800; background: #fff; border: 3px solid #000; display: block; width: fit-content; padding: 2px 8px; transform: skew(-5deg); margin: 1em 0 0.4em; box-shadow: 3px 3px 0px #000; }
-      .theme-acid .markdown-body h4 { font-size: 1em; font-weight: 900; display: flex; align-items: center; gap: 6px; width: fit-content; margin: 0.8em 0 0.2em; }
-      .theme-acid .markdown-body h4::before { content: ''; display: inline-block; width: 8px; height: 8px; background: #000; }
-      .theme-acid .markdown-body blockquote { border-left: 6px solid #000; background: rgba(255,255,255,0.5); padding: 12px; font-weight: bold; border: 2px solid #000; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); }
-      .theme-acid .markdown-body pre { background: #000; color: var(--bg); border: 2px solid #000; }
+      .theme-acid {
+        --bg: #ccff00;
+        --text: #000;
+        --accent: #000;
+      }
+
+      .theme-acid .card-bg {
+        background-color: var(--bg);
+        height: 100%;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        font-family: "Noto Sans SC", sans-serif;
+      }
+
+      .theme-acid .markdown-body h1 {
+        font-size: 1.6em;
+        font-weight: 900;
+        border-bottom: 5px solid #000;
+        text-transform: uppercase;
+        margin: 0.6em 0;
+        line-height: 1.1;
+        font-family: sans-serif;
+      }
+
+      .theme-acid .markdown-body h2 {
+        font-size: 1.3em;
+        font-weight: 800;
+        background: #000;
+        color: var(--bg);
+        display: block;
+        width: fit-content;
+        padding: 4px 10px;
+        transform: skew(-5deg);
+        margin: 1em 0 0.5em;
+      }
+
+      .theme-acid .markdown-body h3 {
+        font-size: 1.15em;
+        font-weight: 800;
+        background: #fff;
+        border: 3px solid #000;
+        display: block;
+        width: fit-content;
+        padding: 2px 8px;
+        transform: skew(-5deg);
+        margin: 1em 0 0.4em;
+        box-shadow: 3px 3px 0px #000;
+      }
+
+      .theme-acid .markdown-body h4 {
+        font-size: 1em;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: fit-content;
+        margin: 0.8em 0 0.2em;
+      }
+
+      .theme-acid .markdown-body h4::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: #000;
+      }
+
+      .theme-acid .markdown-body blockquote {
+        border-left: 6px solid #000;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 12px;
+        font-weight: bold;
+        border: 2px solid #000;
+        box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+      }
+
+      .theme-acid .markdown-body pre {
+        background: #000;
+        color: var(--bg);
+        border: 2px solid #000;
+      }
 
       /* 4. 🔵 科技风 (Tech) */
-      .theme-tech { --bg: #0F172A; --text: #E2E8F0; --accent: #3B82F6; }
-      .theme-tech .card-bg { background: var(--bg); height: 100%; padding: 24px; color: var(--text); position: relative; font-family: 'Inter', sans-serif; }
-      .theme-tech .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(rgba(59,130,246,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.1) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; }
-      .theme-tech .markdown-body h1 { font-size: 1.6em; font-weight: 800; background: linear-gradient(to right, #60A5FA, #A78BFA); -webkit-background-clip: text; color: transparent; border-bottom: 4px solid #7ea4f8;}
-      .theme-tech .markdown-body blockquote { border-left: 4px solid #8B5CF6; background: rgba(139, 92, 246, 0.1); color: #D8B4FE; border-bottom: 2px solid #000;}
-      .theme-tech .markdown-body pre { background: rgba(15, 23, 42, 0.8); border: 1px solid #3B82F6; }
+      .theme-tech {
+        --bg: #0f172a;
+        --text: #e2e8f0;
+        --accent: #3b82f6;
+      }
+
+      .theme-tech .card-bg {
+        background: var(--bg);
+        height: 100%;
+        padding: 24px;
+        color: var(--text);
+        position: relative;
+        font-family: "Inter", sans-serif;
+      }
+
+      .theme-tech .grid-bg {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+      }
+
+      .theme-tech .markdown-body h1 {
+        font-size: 1.6em;
+        font-weight: 800;
+        background: linear-gradient(to right, #60a5fa, #a78bfa);
+        -webkit-background-clip: text;
+        color: transparent;
+        border-bottom: 4px solid #7ea4f8;
+      }
+
+      .theme-tech .markdown-body blockquote {
+        border-left: 4px solid #8b5cf6;
+        background: rgba(139, 92, 246, 0.1);
+        color: #d8b4fe;
+        border-bottom: 2px solid #000;
+      }
+
+      .theme-tech .markdown-body pre {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid #3b82f6;
+      }
     </style>
   </head>
+
   <body class="flex h-screen w-full text-gray-800 select-none overflow-hidden">
     <aside
       id="left-panel"
@@ -170,30 +523,29 @@
           oninput="updatePreview()"
           spellcheck="false"
         >
-# 这是一个一级标题
+          # 这是一个一级标题
 
-## 这是一个二级标题
+          ## 这是一个二级标题
 
-这里是正文段落。如果需要强调，可以使用**加粗文字**。
+          这里是正文段落。如果需要强调，可以使用**加粗文字**。
 
-### 常用功能演示：
+          ### 常用功能演示：
 
-**1. 列表**
-- 观点一：阅读很重要
-- 观点二：亲子陪伴
+          **1. 列表**
+          - 观点一：阅读很重要
+          - 观点二：亲子陪伴
 
-**2. 引用块**
-> “阅读是孩子看世界的窗口。”
+          **2. 引用块**
+          > “阅读是孩子看世界的窗口。”
 
-**3. 如何分页？**
-在需要切分的地方输入 `@` 加上三个减号：
-@---
+          **3. 如何分页？**
+          在需要切分的地方输入 `@` 加上三个减号：
+          @---
 
-**4. 如何插入图片？**
-- 方法A：直接截图，在这里按 Ctrl+V 粘贴
-- 方法B：点击上方的“插入图片”按钮
-</textarea
-        >
+          **4. 如何插入图片？**
+          - 方法A：直接截图，在这里按 Ctrl+V 粘贴
+          - 方法B：点击上方的“插入图片”按钮
+        </textarea>
         <div class="mt-2 text-[10px] text-gray-400 text-center">
           输入 @ + --- 可强制分页
         </div>
