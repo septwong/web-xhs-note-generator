@@ -2,34 +2,82 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+## Development Setup
 
-A single-page web application (小红书笔记生成器) for creating Xiaohongshu-style social media notes. Pure static HTML with embedded CSS/JS - no build process required. Open `index.html` directly in browser to run.
+This is a **pure static HTML application** with no build tools or dependencies. To run:
 
-## Key Features
+```bash
+# Open in browser (no server required for local files)
+open index.html
+# or simply open the index.html file in any web browser
+```
 
-- **Markdown Editor** (left panel): Write content with image paste support (Ctrl+V)
-- **Live Preview** (center): Real-time card preview with zoom and grid/list views
-- **Style Config** (right panel): 4 themes (Minimal, Serif, Acid, Tech), cover settings, typography controls
-- **Export**: Single JPG or bulk ZIP download via html-to-image + jszip
+## Project Structure
 
-## File Structure
+```
+web-xhs-note-generator/
+├── index.html              # Landing page (entry point)
+├── views/
+│   ├── note.html          # Main editor (Markdown-based)
+│   └── cover.html         # Cover generator
+├── fonts/
+│   ├── fonts.css          # Font definitions (Noto Sans SC, Inter)
+│   ├── Inter-Regular.ttf
+│   ├── Inter-Bold.ttf
+│   ├── NotoSansSC-Regular.ttf
+│   └── NotoSansSC-Bold.ttf
+└── favicon.svg
+```
 
-- `index.html` - Complete application (1400+ lines)
-  - Inline Tailwind CSS via CDN
-  - 4 theme definitions (`.theme-minimal`, `.theme-serif`, `.theme-acid`, `.theme-tech`)
-  - Embedded JavaScript for editor, renderer, and export logic
+## Architecture Overview
 
-## Important Implementation Details
+### Multi-Page Application
 
-- **Image handling**: Paste images as base64, stored in `state.bodyImages` object, referenced in markdown as `![截图](img:{id})`
-- **Page splitting**: Use `@---` delimiter in markdown to create multiple cards
-- **Row layout**: Use `::: row ... :::` syntax for multi-image rows
-- **State management**: `state` object tracks style, sizes, and images
-- **Themes**: `STYLES` array defines 4 built-in themes with CSS classes and config objects
+Unlike what the original CLAUDE.md suggests, this is a **multi-page static application** with two main pages:
 
-## Common Tasks
+1. **[index.html](index.html)** - Landing page with cards linking to tools
+2. **[views/note.html](views/note.html)** - Main editor with three-panel layout
+3. **[views/cover.html](views/cover.html)** - Cover generator
 
-- Add new theme: Define CSS class (`.theme-X`) and add entry to `STYLES` array + `themeStyles` object in `renderCoverHTML`
-- Modify export quality: Adjust `pixelRatio` and `quality` in `htmlToImage.toJpeg()` calls
-- Add new font: Add Google Fonts link in `<head>`, reference in CSS
+### Key Components (note.html)
+
+1. **Three-Panel Layout**
+   - Left panel: Markdown editor for content creation
+   - Center: Live preview canvas with zoom/viewport controls
+   - Right panel: Configuration parameters (themes, text, images)
+
+2. **Theme System** (4 styles defined in JS)
+   - `minimal`: Light blue background with dark blue text
+   - `serif`: Book-inspired style with serif fonts
+   - `acid`: High-contrast acid green theme
+   - `tech`: Dark tech theme with grid background
+
+3. **Markdown Processing**
+   - Uses `marked.js` for Markdown parsing
+   - Custom image renderer supporting `img:{id}` syntax for local images
+   - `@---` separator for multi-page pagination
+
+4. **State Management**
+   - All state in `state` object (styleId, titleSize, bodySize, coverImage, bodyImages)
+   - `localStorage` persistence across sessions
+   - URL parameter support (`?title=...&content=...`)
+
+5. **Image Handling**
+   - Cover image upload (localized to card)
+   - Body images through paste (Ctrl+V) or upload button
+   - Base64 storage in `state.bodyImages` object
+   - Image manager UI for managing embedded images
+
+6. **Export Functionality**
+   - `html-to-image` library for single card export
+   - `JSZip` + `FileSaver` for batch ZIP export
+   - 2x pixelRatio for high-quality JPG output
+
+### Font Localization
+
+Fonts are served locally from `fonts/` directory (see [fonts/fonts.css](fonts/fonts.css)):
+- Inter (Regular, Bold, Bold 800)
+- Noto Sans SC (Regular, Medium 500, Bold 700, 900)
+- Noto Serif SC (fallback to Noto Sans SC)
+
+This avoids CORS issues with `html-to-image` and network dependencies.
